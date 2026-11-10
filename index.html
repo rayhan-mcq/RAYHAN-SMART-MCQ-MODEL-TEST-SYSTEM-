@@ -1,1 +1,131 @@
 
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rayhan Smart MCQ</title>
+<style>
+body {
+  font-family: Arial;
+  background: #eef2ff;
+  padding: 20px;
+  text-align: center;
+}
+.box {
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  max-width: 500px;
+  margin: auto;
+}
+h1 { color: #2446aa; }
+button {
+  display: block;
+  width: 100%;
+  padding: 13px;
+  margin: 10px 0;
+  border: 1px solid #2446aa;
+  border-radius: 8px;
+  background: white;
+  font-size: 17px;
+}
+button.selected {
+  background: #2446aa;
+  color: white;
+}
+#submit {
+  background: #2446aa;
+  color: white;
+}
+</style>
+</head>
+<body>
+<div class="box">
+<h1>Rayhan Smart MCQ</h1>
+<h3>অনলাইন পরীক্ষা</h3>
+<p id="timer">সময়: 60 সেকেন্ড</p>
+<h3 id="question">বাংলাদেশের রাজধানী কোনটি?</h3>
+<div id="options"></div>
+<button id="submit" onclick="finish()">পরীক্ষা জমা দিন</button>
+<h2 id="result"></h2>
+</div>
+
+<script>
+const questions = [
+{
+q: "বাংলাদেশের রাজধানী কোনটি?",
+o: ["ঢাকা", "খুলনা", "রাজশাহী", "সিলেট"],
+a: 0
+},
+{
+q: "বাংলাদেশের জাতীয় ফুল কী?",
+o: ["গোলাপ", "শাপলা", "জবা", "বেলি"],
+a: 1
+},
+{
+q: "বাংলাদেশের জাতীয় ফল কী?",
+o: ["আম", "কাঁঠাল", "লিচু", "কলা"],
+a: 1
+}
+];
+
+let current = 0;
+let score = 0;
+let answers = {};
+let time = 60;
+let ended = false;
+
+function showQuestion() {
+ let q = questions[current];
+ document.getElementById("question").innerText =
+ (current+1)+". "+q.q;
+ let html = "";
+ q.o.forEach((op,i) => {
+ html += `<button class="${answers[current]===i?'selected':''}"
+ onclick="choose(${i})">${op}</button>`;
+ });
+ document.getElementById("options").innerHTML = html;
+}
+
+function choose(i) {
+ if(ended) return;
+ answers[current] = i;
+ showQuestion();
+ if(current < questions.length-1) {
+ setTimeout(() => {
+ if(!ended) {
+ current++;
+ showQuestion();
+ }
+ }, 400);
+ }
+}
+
+function finish() {
+ if(ended) return;
+ ended = true;
+ clearInterval(clock);
+ score = questions.filter((q,i) =>
+ answers[i] === q.a).length;
+ document.getElementById("question").innerText =
+ "পরীক্ষা শেষ!";
+ document.getElementById("options").innerHTML = "";
+ document.getElementById("submit").style.display = "none";
+ document.getElementById("result").innerText =
+ "তোমার ফলাফল: "+score+" / "+questions.length;
+}
+
+const clock = setInterval(() => {
+ if(ended) return;
+ time--;
+ document.getElementById("timer").innerText =
+ "সময়: "+time+" সেকেন্ড";
+ if(time <= 0) finish();
+},1000);
+
+showQuestion();
+</script>
+</body>
+</html>
+
