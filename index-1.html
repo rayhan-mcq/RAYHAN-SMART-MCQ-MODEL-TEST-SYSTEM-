@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101827">
+<title>RAYHAN'S SMART MCQ MODEL TEST SYSTEM</title>
+<style>
+:root{--bg:#0b1220;--panel:#121d30;--panel2:#1a2940;--text:#f4f7fb;--muted:#a8b5c8;--accent:#60a5fa;--green:#22c55e;--red:#fb7185;--line:#2b3a52}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(150deg,#0b1220,#14243b);color:var(--text);font-family:system-ui,"Noto Sans Bengali","Hind Siliguri",Arial,sans-serif;min-height:100vh;padding:16px}
+.wrap{max-width:850px;margin:0 auto}
+header{text-align:center;padding:18px 10px 22px}
+.brand{font-size:clamp(22px,5vw,32px);font-weight:850;letter-spacing:.2px;color:#bfdbfe}
+.sub{color:var(--muted);margin:8px 0 0}
+.card{background:rgba(18,29,48,.96);border:1px solid var(--line);border-radius:18px;padding:18px;margin:14px 0;box-shadow:0 12px 35px #0003}
+.row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.pill{background:#20314b;border:1px solid #38506e;border-radius:999px;padding:7px 12px;color:#dbeafe;font-size:14px}
+button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:12px 16px;font-weight:700}
+.primary{background:var(--accent);color:#071426}
+.secondary{background:#263851;color:#eaf2ff;border:1px solid #405674}
+.danger{background:#4b2532;color:#ffe4e8;border:1px solid #854052}
+button:disabled{opacity:.45;cursor:not-allowed}
+.hidden{display:none!important}
+.progress{height:9px;background:#26364e;border-radius:99px;overflow:hidden;margin:12px 0}
+.progress>div{height:100%;width:0;background:linear-gradient(90deg,#38bdf8,#60a5fa);transition:width .2s}
+#question{font-size:clamp(19px,4vw,24px);line-height:1.65;margin:20px 0}
+.option{display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;margin:9px 0;background:#1a2a42;color:#f4f7fb;border:1px solid #344963;line-height:1.5}
+.option .letter{flex:0 0 28px;color:#93c5fd;font-weight:800}
+.option.selected{border:2px solid var(--accent);background:#203c5d}
+.option.correct{border:2px solid var(--green);background:#123b2c}
+.option.wrong{border:2px solid var(--red);background:#48232d}
+.navgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:7px;margin-top:12px}
+.navbtn{padding:9px 4px;background:#24364e;color:#e5edf8;border:1px solid #40516a}
+.navbtn.done{background:#174b3a;border-color:#26865f}
+.navbtn.current{outline:2px solid #93c5fd}
+.navbtn.flag{background:#62491c;border-color:#a98232}
+.small{font-size:13px;color:var(--muted)}
+.statgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.stat{background:#1b2a40;padding:14px;border-radius:13px;text-align:center}
+.stat b{display:block;font-size:25px;color:#bfdbfe}
+.reviewitem{border-bottom:1px solid var(--line);padding:14px 0;line-height:1.65}
+.good{color:#86efac}.bad{color:#fda4af}
+footer{text-align:center;color:#8293aa;font-size:12px;padding:20px}
+@media(min-width:650px){body{padding:24px}.card{padding:24px}.statgrid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+ <div class="brand">RAYHAN'S SMART MCQ MODEL TEST SYSTEM 💡</div>
+ <p class="sub">বাঙ্গালার নব্য লেখকদিগের প্রতি নিবেদন — MCQ Model Test</p>
+</header>
+
+<section id="startScreen" class="card">
+ <h2>পরীক্ষা শুরু করার আগে</h2>
+ <p>PDF থেকে Answer Key-সহ নিশ্চিতভাবে শনাক্ত করা প্রশ্নগুলোই এই পরীক্ষায় রাখা হয়েছে। উত্তর অস্পষ্ট এমন প্রশ্ন বাদ দেওয়া হয়েছে।</p>
+ <div class="statgrid">
+  <div class="stat"><b id="totalStart">0</b><span>যাচাইকৃত প্রশ্ন</span></div>
+  <div class="stat"><b>১</b><span>প্রতি প্রশ্নে নম্বর</span></div>
+  <div class="stat"><b>৩০</b><span>মিনিট সময়</span></div>
+  <div class="stat"><b>০</b><span>নেগেটিভ মার্কিং</span></div>
+ </div>
+ <p class="small">প্রশ্নের মূল PDF-ক্রম বজায় রাখা হয়েছে। পরীক্ষা শুরু হলে টাইমার চালু হবে।</p>
+ <button class="primary" style="width:100%;margin-top:10px" onclick="startExam()">পরীক্ষা শুরু করুন</button>
+</section>
+
+<section id="examScreen" class="hidden">
+ <div class="card">
+  <div class="row">
+   <span class="pill" id="counter">প্রশ্ন ১ / ১</span>
+   <span class="pill" id="timer">সময়: ৩০:০০</span>
+  </div>
+  <div class="progress"><div id="progressFill"></div></div>
+  <div class="row small">
+   <span id="answeredLabel">উত্তর: ০</span>
+   <span id="skippedLabel">বাকি/স্কিপ: ০</span>
+  </div>
+  <h2 id="question"></h2>
+  <div id="options"></div>
+  <div class="row" style="margin-top:18px">
+   <button class="secondary" id="prevBtn" onclick="move(-1)">← আগের</button>
+   <button class="secondary" id="skipBtn" onclick="skipQuestion()">স্কিপ</button>
+   <button class="primary" id="nextBtn" onclick="move(1)">পরের →</button>
+  </div>
+ </div>
+ <div class="card">
+  <div class="row"><b>Question Navigation</b><span class="small">সবুজ = উত্তর দেওয়া</span></div>
+  <div class="navgrid" id="navigation"></div>
+  <button class="primary" style="width:100%;margin-top:18px" onclick="confirmFinish()">পরীক্ষা জমা দিন</button>
+ </div>
+</section>
+
+<section id="resultScreen" class="hidden">
+ <div class="card">
+  <h2>পরীক্ষার ফলাফল</h2>
+  <div class="statgrid">
+   <div class="stat"><b id="scoreOut">০</b><span>প্রাপ্ত নম্বর</span></div>
+   <div class="stat"><b id="correctOut">০</b><span>সঠিক</span></div>
+   <div class="stat"><b id="wrongOut">০</b><span>ভুল</span></div>
+   <div class="stat"><b id="skipOut">০</b><span>উত্তর না দেওয়া</span></div>
+  </div>
+  <h2 id="percentOut" style="text-align:center;color:#93c5fd"></h2>
+  <p id="resultMessage" style="text-align:center"></p>
+  <div class="row">
+   <button class="secondary" onclick="showReview()">উত্তর পর্যালোচনা</button>
+   <button class="primary" onclick="location.reload()">আবার পরীক্ষা দিন</button>
+  </div>
+ </div>
+ <div id="review" class="card hidden"></div>
+ <div class="card">
+  <h3>এই ডিভাইসের সর্বোচ্চ স্কোর</h3>
+  <p id="bestScore">এখনো কোনো স্কোর সংরক্ষিত নেই।</p>
+  <p class="small">এই স্কোর শুধু এই ব্রাউজার/ডিভাইসে সংরক্ষিত হয়; এটি অনলাইন সবার জন্য শেয়ার করা Leaderboard নয়।</p>
+ </div>
+</section>
+<footer>RAYHAN'S SMART MCQ MODEL TEST SYSTEM · Verified questions only</footer>
+</div>
+
+<script>
+/* PDF source: বাঙ্গালার নব্য Solve Class.pdf.
+   Only items with a clearly boxed answer option were included.
+   sourceNo preserves the printed question number; final numbering is dynamic. */
+const questions = [
+ {id:"Q5",sourceNo:"৫",page:6,q:"বঙ্কিমচন্দ্র চট্টোপাধ্যায় পশ্চিমবঙ্গের কোথায় জন্মগ্রহণ করেন?",o:["হুগলি","বর্ধমান","মেদিনীপুর","চব্বিশ পরগনা"],a:3},
+ {id:"Q6",sourceNo:"৬",page:7,q:"বঙ্কিমচন্দ্র চট্টোপাধ্যায় কোন শতকের অন্যতম শ্রেষ্ঠ বাঙালি লেখক?",o:["সতেরো","আঠারো","উনিশ","বিশ"],a:2},
+ {id:"Q7",sourceNo:"৭",page:8,q:"বঙ্কিমচন্দ্র চট্টোপাধ্যায় কোন পত্রিকায় কবিতা প্রকাশের মাধ্যমে সাহিত্যচর্চা শুরু করেন?",o:["বঙ্গদর্শন","সাধনা","বেঙ্গল গেজেট","সংবাদ প্রভাকর"],a:3},
+ {id:"Q11",sourceNo:"১১",page:12,q:"‘রচনার পরিপাট্যের বিশেষ হানিজনক’—কোনটি?",o:["রচনা ফেলে রাখা","অলংকার প্রয়োগ","প্রমাণাদি সংযুক্ত করা","বিদ্যা প্রকাশের চেষ্টা"],a:3},
+ {id:"Q12",sourceNo:"১২",page:13,q:"প্রবন্ধ অনুসারে কোথায় অনেকে টাকার জন্য লেখে এবং টাকাও পায়?",o:["এশিয়ায়","ইউরোপে","আফ্রিকায়","অস্ট্রেলিয়ায়"],a:1},
+ {id:"Q14",sourceNo:"১৪",page:15,q:"সত্য ও ধর্ম ব্যতীত অন্য উদ্দেশ্যে লেখনী ধারণকে বঙ্কিমচন্দ্র কী বলেছেন?",o:["মহাপাপ","ব্যক্তিস্বাধীনতা","অপ্রয়োজনীয়","অরুচিকর"],a:0},
+ {id:"Q15",sourceNo:"১৫",page:16,q:"অন্যের লেখা থেকে বক্তব্য উদ্ধৃত করে অপর লেখায় ব্যবহারের নাম কী?",o:["ডিকটেশন","কোটেশন","কালেকশন","ডিস্টিংকশন"],a:1},
+ {id:"Q16",sourceNo:"১৬",page:17,q:"রচনায় লেখকের বিদ্যা প্রকাশের চেষ্টা পাঠকের জন্য কী হয়ে ওঠে?",o:["অবমাননাকর","বিরক্তিকর","হানিকর","ভয়ংকর"],a:1},
+ {id:"Q17",sourceNo:"১৭",page:18,q:"‘বাঙ্গালার নব লেখকদিগের প্রতি নিবেদন’ রচনার লক্ষ্যীয় বিষয় কোনটি?",o:["বিদেশি সাহিত্যের অনুকরণ","দুর্বোধ্য শব্দের ব্যবহার","চিন্তার মৌলিকত্ব","লোকরঞ্জন-প্রবৃত্তি"],a:2},
+ {id:"Q18",sourceNo:"১৮",page:19,q:"বঙ্কিমচন্দ্র চট্টোপাধ্যায় কোনটিকে ‘বাঙ্গালার ভরসা’ বলেছেন?",o:["বাঙ্গালার সাহিত্য","বাংলা প্রকৃতি","বাঙ্গালার কৃষি","বাংলা মানুষ"],a:0},
+ {id:"Q19",sourceNo:"১৯",page:20,q:"‘বাঙ্গালার নব লেখকদিগের প্রতি নিবেদন’ প্রবন্ধটি কত খ্রিস্টাব্দে প্রথম প্রকাশিত হয়?",o:["১৮৬৫","১৮৭৫","১৮৮৫","১৮৯৫"],a:2},
+ {id:"Q20",sourceNo:"২০",page:21,q:"বঙ্কিমচন্দ্র চট্টোপাধ্যায় চাকরিসূত্রে কোথায় ম্যাজিস্ট্রেট হিসেবে যোগদান করে নীলকরদের অত্যাচার দমন করেছিলেন?",o:["যশোর","বরিশাল","ঢাকায়","খুলনায়"],a:3},
+ {id:"Q21",sourceNo:"২১",page:22,q:"‘অলংকার’ শব্দ দিয়ে কোনটি বোঝায়?",o:["শোভা","আচ্ছাদন","সৌষ্ঠব","সৃজন"],a:0},
+ {id:"Q22",sourceNo:"২২",page:23,q:"‘যশ’ শব্দের অর্থ কী?",o:["সুনাম","ক্ষমতা","সুবিচার","দক্ষতা"],a:0},
+ {id:"Q23",sourceNo:"২৩",page:24,q:"বাংলা সাহিত্যের উন্নতির জন্য বঙ্কিমচন্দ্র কয়টি নিয়ম মেনে চলার কথা বলেছেন?",o:["১০টি","১১টি","১২টি","১৩টি"],a:2},
+ {id:"Q26",sourceNo:"২৬",page:27,q:"বঙ্কিমচন্দ্র চট্টোপাধ্যায়ের উপাধি কী?",o:["কবিকঙ্কণ","ভোরের পাখি","সাহিত্যসম্রাট","সাধু কবি"],a:2},
+ {id:"Q27",sourceNo:"২৭",page:28,q:"আমাদের সাধারণ পাঠকের রুচি ও শিক্ষা বিবেচনা করে লোকরঞ্জন করা হলে রচনা কেমন হয়ে ওঠে?",o:["সত্য ও সুন্দর","জটিল ও দুর্বোধ্য","বিকৃত ও অনিষ্টকর","সরল ও সহজবোধ্য"],a:2},
+ {id:"Q28",sourceNo:"২৮",page:29,q:"‘বাঙ্গালা’ শব্দ দ্বারা কোনটি বোঝানো হয়?",o:["বাংলাদেশ","বাংলা ভাষা","বাংলার মানুষ","বাংলার প্রকৃতি"],a:1}
+];
+const letters=["ক","খ","গ","ঘ"];
+let current=0,answers={},remaining=30*60,ended=false,clock=null;
+const $=id=>document.getElementById(id);
+const bn=n=>String(n).replace(/\d/g,d=>"০১২৩৪৫৬৭৮৯"[d]);
+$("totalStart").textContent=bn(questions.length);
+function startExam(){
+ $("startScreen").classList.add("hidden");$("examScreen").classList.remove("hidden");
+ render();clock=setInterval(()=>{if(ended)return;remaining--;updateTimer();if(remaining<=0)finish();},1000);
+}
+function updateTimer(){let m=Math.floor(remaining/60),s=remaining%60;$("timer").textContent="সময়: "+bn(String(m).padStart(2,"0"))+":"+bn(String(s).padStart(2,"0"));if(remaining<=300)$("timer").style.color="#fda4af";}
+function render(){
+ const q=questions[current];$("counter").textContent="প্রশ্ন "+bn(current+1)+" / "+bn(questions.length);
+ $("question").textContent=(bn(current+1)+". "+q.q);
+ $("options").innerHTML="";
+ q.o.forEach((op,i)=>{const b=document.createElement("button");b.className="option"+(answers[current]===i?" selected":"");b.innerHTML='<span class="letter">'+letters[i]+'.</span><span></span>';b.lastChild.textContent=op;b.onclick=()=>select(i);$("options").appendChild(b);});
+ $("prevBtn").disabled=current===0;$("nextBtn").textContent=current===questions.length-1?"শেষ প্রশ্ন":"পরের →";
+ $("progressFill").style.width=((current+1)/questions.length*100)+"%";
+ const done=Object.keys(answers).length;$("answeredLabel").textContent="উত্তর: "+bn(done);
+ $("skippedLabel").textContent="বাকি/স্কিপ: "+bn(questions.length-done);
+ $("navigation").innerHTML="";
+ questions.forEach((_,i)=>{const b=document.createElement("button");b.className="navbtn"+(answers[i]!==undefined?" done":"")+(i===current?" current":"");b.textContent=bn(i+1);b.onclick=()=>{current=i;render();};$("navigation").appendChild(b);});
+}
+function select(i){if(ended)return;answers[current]=i;render();}
+function move(d){current=Math.max(0,Math.min(questions.length-1,current+d));render();}
+function skipQuestion(){if(current<questions.length-1)move(1);else{const next=questions.findIndex((q,i)=>answers[i]===undefined);if(next>=0){current=next;render();}else finish();}}
+function confirmFinish(){const unanswered=questions.length-Object.keys(answers).length;if(unanswered&&!confirm("এখনো "+bn(unanswered)+"টি প্রশ্নের উত্তর দেওয়া হয়নি। জমা দেবেন?"))return;finish();}
+function finish(){
+ if(ended)return;ended=true;clearInterval(clock);
+ let correct=0;questions.forEach((q,i)=>{if(answers[i]===q.a)correct++;});
+ const wrong=Object.keys(answers).length-correct,skip=questions.length-Object.keys(answers).length;
+ const pct=Math.round(correct/questions.length*100);
+ $("examScreen").classList.add("hidden");$("resultScreen").classList.remove("hidden");
+ $("scoreOut").textContent=bn(correct)+" / "+bn(questions.length);$("correctOut").textContent=bn(correct);
+ $("wrongOut").textContent=bn(wrong);$("skipOut").textContent=bn(skip);
+ $("percentOut").textContent="শতকরা নম্বর: "+bn(pct)+"%";
+ $("resultMessage").textContent=pct>=80?"চমৎকার ফলাফল!":pct>=50?"ভালো চেষ্টা! আরও অনুশীলন করো।":"আবার অনুশীলন করো, তুমি পারবে।";
+ let best=Number(localStorage.getItem("rayhanSmartMcqBest")||0);if(correct>best){best=correct;localStorage.setItem("rayhanSmartMcqBest",String(best));}
+ $("bestScore").textContent="সর্বোচ্চ স্কোর: "+bn(best)+" / "+bn(questions.length);
+}
+function showReview(){
+ const box=$("review");box.classList.remove("hidden");box.innerHTML="<h3>উত্তর পর্যালোচনা</h3>";
+ questions.forEach((q,i)=>{const chosen=answers[i];const ok=chosen===q.a;const div=document.createElement("div");div.className="reviewitem";
+ const title=document.createElement("b");title.textContent=bn(i+1)+". "+q.q;div.appendChild(title);
+ const p=document.createElement("p");p.className=ok?"good":"bad";p.textContent=chosen===undefined?"তোমার উত্তর: দেওয়া হয়নি":"তোমার উত্তর: "+letters[chosen]+". "+q.o[chosen];div.appendChild(p);
+ const ans=document.createElement("p");ans.className="good";ans.textContent="সঠিক উত্তর: "+letters[q.a]+". "+q.o[q.a];div.appendChild(ans);
+ const src=document.createElement("span");src.className="small";src.textContent="PDF-এর মূল প্রশ্ন "+q.sourceNo+" · পৃষ্ঠা "+bn(q.page);div.appendChild(src);box.appendChild(div);
+ });
+}
+</script>
+</body>
+</html>
